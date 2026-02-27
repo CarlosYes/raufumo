@@ -2,11 +2,11 @@
 <html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
-    <title>Radio Amigos Unidos - Rainbow Smoke & Names</title>
+    <title>Radio Amigos Unidos - Rainbow Smoke Edition</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
     <link rel="icon" type="image/png" href="https://i.imgur.com/nNh98kV.png" sizes="192x192" />
     <style>
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; -webkit-user-select: none; user-select: none; font-family: sans-serif; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; -webkit-user-select: none; user-select: none; }
         canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
         
         .logo-container { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); z-index: 5; pointer-events: none; }
@@ -27,15 +27,7 @@
             background: linear-gradient(45deg, #ffff00, #00d9ff, #ff00ff, #00ff00); 
             background-size: 400%; border-radius: 12px; 
             animation: rainbow 30s linear infinite; flex-shrink: 0;
-            position: relative; text-align: center;
-        }
-
-        /* ESTILO PARA OS NOMES */
-        .name-label {
-            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.6); color: #fff; padding: 2px 8px;
-            border-radius: 4px; font-size: 14px; font-weight: bold;
-            text-transform: uppercase; white-space: nowrap; z-index: 11;
+            position: relative; 
         }
 
         .bird-overlay {
@@ -66,42 +58,41 @@
     <div class="photobanner-container">
         <div class="photobanner">
             <script>
-                const staff = [
-                    { src: "https://xatimg.com/image/G9aZLhJTghaK.png", name: "" },
-                    { src: "https://xatimg.com/image/NVlH1z0f4nKF.jpg", name: "nanito" },
-                    { src: "https://xatimg.com/image/8LbH5lPmEH1s.jpg", name: "lydia" },
-                    { src: "https://xatimg.com/image/UFdsiJCVo5T9.jpg", name: "anjo" },
-                    { src: "https://xatimg.com/image/iGyY0rOtGkKN.jpg", name: "filó" },
-                    { src: "https://xatimg.com/image/DqIJkxRepz8m.jpg", name: "santos" },
-                    { src: "https://xatimg.com/image/qktmURudMDfz.jpg", name: "marga" },
-                    { src: "https://xatimg.com/image/F0kPR63gfr4i.jpg", name: "dja" },
-                    { src: "https://xatimg.com/image/8FB3ueoHs4rB.jpg", name: "pedro" },
-                    { src: "https://xatimg.com/image/P9grH9FaUtNZ.jpg", name: "emi" },
-                    { src: "https://xatimg.com/image/ULJ11YVg3HZt.jpg", name: "lobo" },
-                    { src: "https://xatimg.com/image/CNK9BHZD4JiB.jpg", name: "adelaide" },
-                    { src: "https://xatimg.com/image/wBEFTfX7wrKm.jpg", name: "maroto" },
-                    { src: "https://xatimg.com/image/4mKNXANhhfc5.jpg", name: "ana" },
-                    { src: "https://xatimg.com/image/L79hOX8jXqYV.jpg", name: "roger" },
-                    { src: "https://xatimg.com/image/16w2ge7ybIV5.jpg", name: "jow" },
-                    { src: "https://xatimg.com/image/BHXrfcoYoyKC.jpg", name: "lina" },
-                    { src: "https://xatimg.com/image/V0kyQhtqKG1p.jpg", name: "josé rodrigues" },
-                    { src: "https://xatimg.com/image/5FI24YJqIDNM.jpg", name: "gi" },
-                    { src: "https://xatimg.com/image/ZTIKFaXsSdJs.jpg", name: "zeca" },
-                    { src: "https://xatimg.com/image/vwrwZesYUSJe.gif", name: "boneca" },
-                    { src: "https://xatimg.com/image/imvSUJEnnkY4.jpg", name: "carlos" },
-                    { src: "https://xatimg.com/image/5oD6mKpJ191f.gif", name: "gif" }
+                // Lista recuperada com links e identificação interna (alt)
+                const images = [
+                    { src: "https://xatimg.com/image/G9aZLhJTghaK.png", alt: "" },
+                    { src: "https://xatimg.com/image/NVlH1z0f4nKF.jpg", alt: "nanito" },
+                    { src: "https://xatimg.com/image/8LbH5lPmEH1s.jpg", alt: "lydia" },
+                    { src: "https://xatimg.com/image/UFdsiJCVo5T9.jpg", alt: "anjo" },
+                    { src: "https://xatimg.com/image/iGyY0rOtGkKN.jpg", alt: "filó" },
+                    { src: "https://xatimg.com/image/DqIJkxRepz8m.jpg", alt: "santos" },
+                    { src: "https://xatimg.com/image/qktmURudMDfz.jpg", alt: "marga" },
+                    { src: "https://xatimg.com/image/F0kPR63gfr4i.jpg", alt: "dja" },
+                    { src: "https://xatimg.com/image/8FB3ueoHs4rB.jpg", alt: "pedro" },
+                    { src: "https://xatimg.com/image/P9grH9FaUtNZ.jpg", alt: "emi" },
+                    { src: "https://xatimg.com/image/ULJ11YVg3HZt.jpg", alt: "lobo" },
+                    { src: "https://xatimg.com/image/CNK9BHZD4JiB.jpg", alt: "adelaide" },
+                    { src: "https://xatimg.com/image/wBEFTfX7wrKm.jpg", alt: "maroto" },
+                    { src: "https://xatimg.com/image/4mKNXANhhfc5.jpg", alt: "ana" },
+                    { src: "https://xatimg.com/image/L79hOX8jXqYV.jpg", alt: "roger" },
+                    { src: "https://xatimg.com/image/F6n4HrsqHKud.jpg", alt: "sagitaria" },
+                    { src: "https://xatimg.com/image/16w2ge7ybIV5.jpg", alt: "jow" },
+                    { src: "https://xatimg.com/image/BHXrfcoYoyKC.jpg", alt: "lina" },
+                    { src: "https://xatimg.com/image/V0kyQhtqKG1p.jpg", alt: "josé rodrigues" },
+                    { src: "https://xatimg.com/image/5FI24YJqIDNM.jpg", alt: "gi" },
+                    { src: "https://xatimg.com/image/ZTIKFaXsSdJs.jpg", alt: "zeca" },
+                    { src: "https://xatimg.com/image/vwrwZesYUSJe.gif", alt: "boneca" },
+                    { src: "https://xatimg.com/image/imvSUJEnnkY4.jpg", alt: "carlos" },
+                    { src: "https://xatimg.com/image/5oD6mKpJ191f.gif", alt: "gif" }
                 ];
+                
                 const birdGif = "https://i.imgur.com/HPIUvNC.gif";
                 const banner = document.querySelector('.photobanner');
                 
-                staff.forEach(person => {
+                images.forEach(imgData => {
                     const card = document.createElement('div');
                     card.className = 'photo-card';
-                    card.innerHTML = `
-                        <img src="${birdGif}" class="bird-overlay">
-                        <img src="${person.src}" />
-                        ${person.name ? `<div class="name-label">${person.name}</div>` : ''}
-                    `;
+                    card.innerHTML = `<img src="${birdGif}" class="bird-overlay"><img src="${imgData.src}" alt="${imgData.alt}" />`;
                     banner.appendChild(card);
                 });
             </script>
@@ -146,7 +137,7 @@
         float f = fbm(uv + r);
         vec3 col = rainbow(t * 0.1 + f * 0.2);
         vec3 finalCol = mix(vec3(0.0), col, f * 1.5) + f * f * col * 0.5;
-        O = vec4(finalCol * 1.3, 1.0);
+        O = vec4(finalCol * 1.4, 1.0);
     }
     </script>
 
@@ -189,6 +180,12 @@
         var message = "©arlos Copyright - Proteção RAU";
         document.oncontextmenu = function(){ alert(message); return false; };
         document.onselectstart = function(){ return false; };
+        window.addEventListener('keydown', function(e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) {
+                e.preventDefault();
+                return false;
+            }
+        });
     </script>
 </body>
 </html>
