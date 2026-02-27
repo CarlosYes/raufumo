@@ -1,0 +1,281 @@
+ <!DOCTYPE html>
+<html lang=pt-PT>
+<head>
+<title>Radio Amigos Unidos</title>
+<meta name="description" content="RAU" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv=X-UA-Compatible content="IE=Edge"/>
+<meta property="og:title" content="RAU Player" />
+<meta property="og:description" content="RAU" />
+<link rel="icon" type="image/png" href="https://i.imgur.com/nNh98kV.png" sizes="48x48" />
+<link rel="icon" type="image/png" href="https://i.imgur.com/nNh98kV.png" sizes="96x96" />
+<link rel="icon" type="image/png" href="https://i.imgur.com/nNh98kV.png" sizes="144x144" />
+<link rel="icon" type="image/png" href="https://i.imgur.com/nNh98kV.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://i.imgur.com/nNh98kV.png" sizes="180x180"/>
+    <style>
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+        canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+        
+        .logo-container { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); z-index: 5; pointer-events: none; }
+        .radio-logo { width: 22vw; min-width: 200px; max-width: 350px; filter: drop-shadow(0 0 30px rgba(0,0,0,0.8)); animation: float 15s ease-in-out infinite; }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        .photobanner-container { 
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 380px; 
+            overflow: hidden; z-index: 10; background: transparent !important;
+            display: flex; align-items: flex-end; 
+        }
+        
+        .photobanner { display: flex; width: max-content; animation: scroll 160s linear infinite; }
+        
+        .photo-card { 
+            height: 240px; margin: 0 15px; padding: 5px; 
+            background: linear-gradient(45deg, #ffff00, #00d9ff, #ff00ff, #00ff00); 
+            background-size: 400%; border-radius: 12px; 
+            animation: rainbow 30s linear infinite; flex-shrink: 0;
+            position: relative; 
+            overflow: visible;
+        }
+
+        .bird-overlay {
+            position: absolute;
+            width: 38px;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            pointer-events: none;
+            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.7));
+            animation: bird-hover 2s ease-in-out infinite;
+        }
+
+        @keyframes bird-hover {
+            0%, 100% { transform: translateX(-50%) translateY(0) rotate(-5deg); }
+            50% { transform: translateX(-50%) translateY(-3px) rotate(5deg); }
+        }
+
+        .photo-card img:not(.bird-overlay) { height: 100%; width: auto; border-radius: 8px; display: block; }
+
+        @keyframes rainbow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes scroll { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+    </style>
+</head>
+<body>
+
+    <canvas id="shaderCanvas"></canvas>
+
+    <div class="logo-container">
+        <img src="https://i.imgur.com/R3zxEUk.png" alt="Logo" class="radio-logo">
+    </div>
+
+    <div class="photobanner-container">
+        <div class="photobanner">
+            <script>
+                const images = [
+                    "https://xatimg.com/image/G9aZLhJTghaK.png", "https://xatimg.com/image/NVlH1z0f4nKF.jpg",
+                    "https://xatimg.com/image/8LbH5lPmEH1s.jpg", "https://xatimg.com/image/UFdsiJCVo5T9.jpg",
+                    "https://xatimg.com/image/iGyY0rOtGkKN.jpg", "https://xatimg.com/image/DqIJkxRepz8m.jpg",
+                    "https://xatimg.com/image/qktmURudMDfz.jpg", "https://xatimg.com/image/F0kPR63gfr4i.jpg",
+                    "https://xatimg.com/image/8FB3ueoHs4rB.jpg", "https://xatimg.com/image/P9grH9FaUtNZ.jpg",
+                    "https://xatimg.com/image/ULJ11YVg3HZt.jpg", "https://xatimg.com/image/CNK9BHZD4JiB.jpg",
+                    "https://xatimg.com/image/wBEFTfX7wrKm.jpg", "https://xatimg.com/image/4mKNXANhhfc5.jpg",
+                    "https://xatimg.com/image/L79hOX8jXqYV.jpg", "https://xatimg.com/image/F6n4HrsqHKud.jpg",
+                    "https://xatimg.com/image/16w2ge7ybIV5.jpg", "https://xatimg.com/image/BHXrfcoYoyKC.jpg",
+                    "https://xatimg.com/image/V0kyQhtqKG1p.jpg", "https://xatimg.com/image/5FI24YJqIDNM.jpg",
+                    "https://xatimg.com/image/ZTIKFaXsSdJs.jpg", "https://xatimg.com/image/vwrwZesYUSJe.gif",
+                    "https://xatimg.com/image/imvSUJEnnkY4.jpg", "https://xatimg.com/image/5oD6mKpJ191f.gif"
+                ];
+
+                const birdGif = "https://i.imgur.com/HPIUvNC.gif";
+                const banner = document.querySelector('.photobanner');
+
+                images.forEach(src => {
+                    const card = document.createElement('div');
+                    card.className = 'photo-card';
+                    card.innerHTML = `
+                        <img src="${birdGif}" class="bird-overlay">
+                        <img src="${src}" />
+                    `;
+                    banner.appendChild(card);
+                });
+            </script>
+        </div>
+    </div>
+
+    <script type="x-shader/x-fragment">#version 300 es
+    precision highp float;
+    out vec4 O;
+    uniform float time;
+    uniform vec2 resolution;
+    #define FC gl_FragCoord.xy
+    #define R resolution
+    #define T (time * 0.2)
+    #define rot(a) mat2(cos(a-vec4(0,11,33,0)))
+
+    float rnd(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233)))*345678.); }
+    
+    float noise(vec2 p) {
+      vec2 i = floor(p), f = fract(p), u = smoothstep(.0, 1., f);
+      float a = rnd(i), b = rnd(i+vec2(1, 0)), c = rnd(i+vec2(0, 1)), d = rnd(i+1.);
+      return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+    }
+
+    float fbm(vec2 p) {
+        float t=.0, a=1.;
+        for (int i=0; i<5; i++) {
+            vec2 s=vec2(noise(p+T),noise(p-T+1.))*2.-.5;
+            t += a*(s.x);
+            p = 2.*p*rot(.39)+s;
+            a *= .5;
+        }
+        return t;
+    }
+
+    // LOGICA DO FUMO
+    float smoke(vec2 p) {
+        float n = noise(p * 0.8 + T * 0.5);
+        n += 0.5 * noise(p * 1.6 - T * 0.3);
+        n += 0.25 * noise(p * 3.2 + T * 0.2);
+        return n;
+    }
+
+    vec3 palette(float t) {
+      vec3 a = vec3(.65), b = vec3(1.5), c = vec3(1,.5,.5), d = vec3(.4,.3,.4);
+      return a+b*cos(2.3*(c*d+t));
+    }
+
+    vec3 pattern(vec2 p) {
+        vec2 q=p*rot(T*.2);
+        float d = fbm(.25*q);
+        return palette((1.-d)*(1.-fbm(p)));
+    }
+
+    vec2 map(vec3 p) { return vec2(-(length(p)-10.),0); }
+
+    void main() {
+      vec2 uv = (FC-.5*R)/min(R.x, R.y);
+      vec3 col = vec3(0), p = vec3(0, 0, exp(sin(3.14+T*.05))*1.5-6.), rd = normalize(vec3(uv, 1.2));
+      
+      float camTime = T * 0.15;
+      p.yz *= rot(sin(camTime)*.4+.3);
+      p.xz *= rot(sin(camTime)*.2);
+      rd.yz *= rot(sin(camTime)*.4+.3);
+      rd.xz *= rot(sin(camTime)*.2);
+
+      for (float i = .0; i < 100.; i++) {
+        vec2 d = map(p);
+        if (abs(d.x) < 1e-3) {
+          col = smoothstep(2.5, -1.0, pattern(p.xy)); 
+          break;
+        }
+        p += rd*d.x;
+      }
+
+      // CAMADA DE FUMO ROSA
+      vec2 smokeUV = uv * 2.5;
+      float f = smoke(smokeUV + vec2(T * 0.2, -T * 0.4));
+      vec3 smokeColor = vec3(1.0, 0.35, 0.67); // Rosa Vibrante
+      col = mix(col, smokeColor, f * 0.35 * smoothstep(1.0, -0.5, uv.y));
+
+      O = vec4(col, 1);
+    }
+    </script>
+
+    <script>
+    window.onload = () => {
+        const canvas = document.getElementById("shaderCanvas");
+        const gl = canvas.getContext("webgl2");
+        const dpr = window.devicePixelRatio || 1;
+        const vs = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vs, "#version 300 es\nin vec4 position; void main(){gl_Position=position;}");
+        gl.compileShader(vs);
+        const fs = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fs, document.querySelector("script[type='x-shader/x-fragment']").textContent);
+        gl.compileShader(fs);
+        
+        const program = gl.createProgram();
+        gl.attachShader(program, vs); gl.attachShader(program, fs);
+        gl.linkProgram(program);
+        
+        const buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,1,-1,-1,1,1,1,-1]), gl.STATIC_DRAW);
+        
+        const resize = () => {
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+        };
+        window.onresize = resize; resize();
+        
+        const render = (now) => {
+            gl.useProgram(program);
+            const pos = gl.getAttribLocation(program, "position");
+            gl.enableVertexAttribArray(pos);
+            gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+            gl.uniform2f(gl.getUniformLocation(program, "resolution"), canvas.width, canvas.height);
+            gl.uniform1f(gl.getUniformLocation(program, "time"), now * 0.001);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            requestAnimationFrame(render);
+        };
+        requestAnimationFrame(render);
+    }
+    </script>
+<script>
+
+    var message = "©arlos Copyright";
+
+    function clickIE4() {
+        if (event.button == 2) {
+            alert(message);
+            return false;
+        }
+    }
+
+    function clickNS4(e) {
+        if (document.layers || document.getElementById && !document.all) {
+            if (e.which == 2 || e.which == 3) {
+                alert(message);
+                return false;
+            }
+        }
+    }
+
+    if (document.layers) {
+        document.captureEvents(Event.MOUSEDOWN);
+        document.onmousedown = clickNS4;
+    } else if (document.all && !document.getElementById) {
+        document.onmousedown = clickIE4;
+    }
+
+    document.oncontextmenu = new Function("alert(message);return false")
+</script>
+<script>
+
+    function disableselect(e) {
+        return false
+    }
+    function reEnable() {
+        return true
+    }
+    document.onselectstart = new Function("return false")
+    if (window.sidebar) {
+        document.onmousedown = disableselect
+        document.onclick = reEnable
+    }
+</script>
+<script>
+        window.oncontextmenu = function () {
+            console.log("Right Click Disabled");
+            return false;
+        }
+    </script> 
+  
+</body>
+</html>
+
+  </body>
+  
+</html>
